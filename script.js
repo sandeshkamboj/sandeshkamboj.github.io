@@ -1,25 +1,20 @@
-// Wait for Supabase to load with a retry limit
 function initializeApp(attempt = 1, maxAttempts = 50) {
     if (attempt > maxAttempts) {
-        console.error('Failed to load Supabase library after ' + maxAttempts + ' attempts. Please check if supabase.min.js is loaded correctly.');
+        console.error('Failed to load Supabase library after ' + maxAttempts + ' attempts. Please check if Supabase is loaded correctly.');
         return;
     }
 
-    if (typeof Supabase === 'undefined') {
+    if (typeof window.supabase === 'undefined') {
         console.warn('Supabase library not loaded yet, attempt ' + attempt + '/' + maxAttempts);
         setTimeout(() => initializeApp(attempt + 1, maxAttempts), 100);
         return;
     }
 
     console.log('Supabase library loaded successfully on attempt ' + attempt);
-
-    const SUPABASE_URL = 'https://ubixfkksdpzmiixynvqq.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViaXhma2tzZHB6bWlpeHludnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDE3NTUsImV4cCI6MjA2MjExNzc1NX0.yT7aGQvAsYvb9qB2ZiEeK8edeXzs47d0eY94VdfWylc';
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const supabase = window.supabase;
 
     console.log('Supabase client initialized:', supabase);
 
-    // Elements
     const loginSection = document.getElementById('loginSection');
     const mainPanel = document.getElementById('mainPanel');
     const emailInput = document.getElementById('emailInput');
@@ -189,7 +184,6 @@ function initializeApp(attempt = 1, maxAttempts = 50) {
     }
 }
 
-// Start the app
 document.addEventListener('DOMContentLoaded', () => {
     console.log('DOM fully loaded, starting app initialization');
     initializeApp();
