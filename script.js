@@ -95,7 +95,7 @@ function initializeApp(attempt = 1, maxAttempts = 50) {
         const action = actionSelect.value;
         const duration = durationInput.value ? parseInt(durationInput.value) : null;
 
-        console.log('Action:', action, 'Duration:', duration); // Log the values being sent
+        console.log('Action:', action, 'Duration:', duration);
 
         if (action === 'record_video' || action === 'record_audio') {
             if (!duration || duration <= 0) {
@@ -109,14 +109,15 @@ function initializeApp(attempt = 1, maxAttempts = 50) {
             console.log('Attempting to insert request into Supabase...');
             const { data, error } = await supabase
                 .from('requests')
-                .insert([{ action, duration }]);
+                .insert([{ action, duration }])
+                .select(); // Add .select() to return the inserted row
 
             if (error) {
                 console.error('Supabase insert error:', error);
                 throw error;
             }
 
-            console.log('Insert successful, data:', data);
+            console.log('Insert successful, data:', data); // Should log the inserted row
             requestStatus.innerHTML = '<span class="text-success">Request sent successfully!</span>';
             console.log('Request sent successfully!');
             durationInput.value = '';
