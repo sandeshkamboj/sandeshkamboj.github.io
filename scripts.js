@@ -1,3 +1,11 @@
+
+// Check if Supabase is defined
+if (typeof Supabase === 'undefined') {
+    console.error('Supabase library not loaded');
+} else {
+    console.log('Supabase library loaded successfully');
+}
+
 const SUPABASE_URL = 'https://ubixfkksdpzmiixynvqq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViaXhma2tzZHB6bWlpeHludnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDE3NTUsImV4cCI6MjA2MjExNzc1NX0.yT7aGQvAsYvb9qB2ZiEeK8edeXzs47d0eY94VdfWylc';
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -35,7 +43,7 @@ if (!mediaFilesContainer) console.error('mediaFilesContainer not found');
 
 // Check if already logged in
 supabase.auth.getSession().then(({ data: { session } }) => {
-    console.log('Session check:', session); // Debug log
+    console.log('Session check:', session);
     if (session) {
         showMainPanel();
     }
@@ -44,7 +52,7 @@ supabase.auth.getSession().then(({ data: { session } }) => {
 // Login
 if (loginBtn) {
     loginBtn.addEventListener('click', async () => {
-        console.log('Login button clicked'); // Debug log
+        console.log('Login button clicked');
         const email = emailInput.value;
         const password = passwordInput.value;
 
@@ -53,20 +61,20 @@ if (loginBtn) {
             return;
         }
 
-        console.log('Attempting login with email:', email); // Debug log
+        console.log('Attempting login with email:', email);
         try {
             const { data, error } = await supabase.auth.signInWithPassword({
                 email,
                 password
             });
 
-            console.log('Login response:', data, error); // Debug log
+            console.log('Login response:', data, error);
             if (error) throw error;
 
             loginStatus.innerHTML = '<span class="text-success">Logged in successfully!</span>';
             showMainPanel();
         } catch (error) {
-            console.error('Login error:', error); // Debug log
+            console.error('Login error:', error);
             loginStatus.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
         }
     });
@@ -84,7 +92,7 @@ function showMainPanel() {
 // Send Request
 if (sendRequestBtn) {
     sendRequestBtn.addEventListener('click', async () => {
-        console.log('Send Request button clicked'); // Debug log
+        console.log('Send Request button clicked');
         const action = actionSelect.value;
         const duration = durationInput.value ? parseInt(durationInput.value) : null;
 
@@ -105,7 +113,7 @@ if (sendRequestBtn) {
             requestStatus.innerHTML = '<span class="text-success">Request sent successfully!</span>';
             durationInput.value = '';
         } catch (error) {
-            console.error('Error sending request:', error); // Debug log
+            console.error('Error sending request:', error);
             requestStatus.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
         }
     });
