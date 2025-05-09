@@ -1,15 +1,59 @@
-// Initialize Supabase client
-const SUPABASE_URL = 'https://ubixfkksdpzmiixynvqq.supabase.co'; // Replace with your Supabase URL
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViaXhma2tzZHB6bWlpeHludnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDE3NTUsImV4cCI6MjA2MjExNzc1NX0.yT7aGQvAsYvb9qB2ZiEeK8edeXzs47d0eY94VdfWylc'; // Replace with your Supabase Key
+const SUPABASE_URL = 'YOUR_SUPABASE_URL'; // Replace with your Supabase URL
+const SUPABASE_KEY = 'YOUR_ANON_KEY'; // Replace with your Supabase anon key
 const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Elements
+const loginSection = document.getElementById('loginSection');
+const mainPanel = document.getElementById('mainPanel');
+const emailInput = document.getElementById('emailInput');
+const passwordInput = document.getElementById('passwordInput');
+const loginBtn = document.getElementById('loginBtn');
+const loginStatus = document.getElementById('loginStatus');
 const actionSelect = document.getElementById('actionSelect');
 const durationInput = document.getElementById('durationInput');
 const sendRequestBtn = document.getElementById('sendRequestBtn');
 const requestStatus = document.getElementById('requestStatus');
 const locationsTableBody = document.getElementById('locationsTableBody');
 const mediaFilesContainer = document.getElementById('mediaFilesContainer');
+
+// Check if already logged in
+supabase.auth.getSession().then(({ data: { session } }) => {
+    if (session) {
+        showMainPanel();
+    }
+});
+
+// Login
+loginBtn.addEventListener('click', async () => {
+    const email = emailInput.value;
+    const password = passwordInput.value;
+
+    if (!email || !password) {
+        loginStatus.innerHTML = '<span class="text-danger">Please enter email and password.</span>';
+        return;
+    }
+
+    try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+        });
+
+        if (error) throw error;
+
+        loginStatus.innerHTML = '<span class="text-success">Logged in successfully!</span>';
+        showMainPanel();
+    } catch (error) {
+        loginStatus.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
+    }
+});
+
+function showMainPanel() {
+    loginSection.style.display = 'none';
+    mainPanel.style.display = 'block';
+    loadLocations();
+    loadMediaFiles();
+}
 
 // Send Request
 sendRequestBtn.addEventListener('click', async () => {
@@ -31,7 +75,7 @@ sendRequestBtn.addEventListener('click', async () => {
         if (error) throw error;
 
         requestStatus.innerHTML = '<span class="text-success">Request sent successfully!</span>';
-        durationInput.value = ''; // Clear duration input
+        durationInput.value = '';
     } catch (error) {
         requestStatus.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
     }
@@ -103,9 +147,3 @@ async function loadMediaFiles() {
         console.error('Error loading media files:', error);
     }
 }
-
-// Load data on page load
-document.addEventListener('DOMContentLoaded', () => {
-    loadLocations();
-    loadMediaFiles();
-});
