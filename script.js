@@ -90,33 +90,42 @@ function initializeApp(attempt = 1, maxAttempts = 50) {
     }
 
     if (sendRequestBtn) {
-        sendRequestBtn.addEventListener('click', async () => {
-            console.log('Send Request button clicked');
-            const action = actionSelect.value;
-            const duration = durationInput.value ? parseInt(durationInput.value) : null;
+    sendRequestBtn.addEventListener('click', async () => {
+        console.log('Send Request button clicked');
+        const action = actionSelect.value;
+        const duration = durationInput.value ? parseInt(durationInput.value) : null;
 
-            if (action === 'record_video' || action === 'record_audio') {
-                if (!duration || duration <= 0) {
-                    requestStatus.innerHTML = '<span class="text-danger">Please enter a valid duration.</span>';
-                    return;
-                }
+        console.log('Action:', action, 'Duration:', duration); // Log the values being sent
+
+        if (action === 'record_video' || action === 'record_audio') {
+            if (!duration || duration <= 0) {
+                console.log('Validation failed: Duration must be a positive number for video/audio');
+                requestStatus.innerHTML = '<span class="text-danger">Please enter a valid duration.</span>';
+                return;
+            }
+        }
+
+        try {
+            console.log('Attempting to insert request into Supabase...');
+            const { data, error } = await supabase
+                .from('requests')
+                .insert([{ action, duration }]);
+
+            if (error) {
+                console.error('Supabase insert error:', error);
+                throw error;
             }
 
-            try {
-                const { error } = await supabase
-                    .from('requests')
-                    .insert([{ action, duration }]);
-
-                if (error) throw error;
-
-                requestStatus.innerHTML = '<span class="text-success">Request sent successfully!</span>';
-                durationInput.value = '';
-            } catch (error) {
-                console.error('Error sending request:', error);
-                requestStatus.innerHTML = `<span class="text-danger">Error: ${error.message}</span>`;
-            }
-        });
-    }
+            console.log('Insert successful, data:', data);
+            requestStatus.innerHTML = '<span class="text-success">Request sent successfully!</span>';
+            console.log('Request sent successfully!');
+            durationInput.value = '';
+        } catch (error) {
+            console.error('Error sending request:', error);
+            requestStatus.innerHTML = `<span class="text-danger">Error: ${error.message || 'Unknown error'}</span>`;
+        }
+    });
+}
 
     async function loadLocations() {
         try {
