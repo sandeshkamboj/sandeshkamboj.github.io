@@ -1,11 +1,17 @@
-// Wait for Supabase to load
-function initializeApp() {
-    if (typeof Supabase === 'undefined') {
-        console.error('Supabase library not loaded, retrying...');
-        setTimeout(initializeApp, 100); // Retry after 100ms
+// Wait for Supabase to load with a retry limit
+function initializeApp(attempt = 1, maxAttempts = 50) {
+    if (attempt > maxAttempts) {
+        console.error('Failed to load Supabase library after ' + maxAttempts + ' attempts. Please check if supabase.min.js is loaded correctly.');
         return;
     }
-    console.log('Supabase library loaded successfully');
+
+    if (typeof Supabase === 'undefined') {
+        console.warn('Supabase library not loaded yet, attempt ' + attempt + '/' + maxAttempts);
+        setTimeout(() => initializeApp(attempt + 1, maxAttempts), 100);
+        return;
+    }
+
+    console.log('Supabase library loaded successfully on attempt ' + attempt);
 
     const SUPABASE_URL = 'https://ubixfkksdpzmiixynvqq.supabase.co';
     const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InViaXhma2tzZHB6bWlpeHludnFxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDY1NDE3NTUsImV4cCI6MjA2MjExNzc1NX0.yT7aGQvAsYvb9qB2ZiEeK8edeXzs47d0eY94VdfWylc';
@@ -184,4 +190,7 @@ function initializeApp() {
 }
 
 // Start the app
-initializeApp();
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('DOM fully loaded, starting app initialization');
+    initializeApp();
+});
